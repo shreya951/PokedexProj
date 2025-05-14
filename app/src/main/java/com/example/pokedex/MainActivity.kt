@@ -11,14 +11,14 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    private val viewModel: PokeViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val viewModel : PokeViewModel by viewModels()
         super.onCreate(savedInstanceState)
         setContent {
-            PokeScreen()
+            PokeScreen(viewModel)
         }
         enableEdgeToEdge()
+        viewModel.fetchPokemon()
 
 
     }

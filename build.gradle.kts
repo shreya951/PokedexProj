@@ -5,5 +5,6 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
     kotlin("jvm") version "2.0.21" // Your Kotlin version
+
 }
 

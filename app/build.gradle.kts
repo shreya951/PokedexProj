@@ -77,6 +77,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation(libs.moshi.core)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.moshi.codegen)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit)
 }
 
 hilt{

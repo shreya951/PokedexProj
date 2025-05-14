@@ -15,24 +15,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun PokeScreen(){
-    val viewModel: PokeViewModel = viewModel()
-    PokeScreenContent(viewModel)
+fun PokeScreen(viewModel: PokeViewModel){
+    val uiState by viewModel.showImage.collectAsStateWithLifecycle()
+    PokeScreenContent(
+        uiState = uiState,
+        onShowPokeballClicked = {viewModel.setShowImage(true)},
+        onHidePokeballClicked = {viewModel.setShowImage(false)}
+    )
 }
 
 @Composable
-fun PokeScreenContent(viewModel: PokeViewModel){
+fun PokeScreenContent(
+    uiState: PokeScreenUIState,
+    onShowPokeballClicked: () -> Unit,
+    onHidePokeballClicked: () -> Unit
+){
     val babyBlue = Color(0XFFB9DFF7)
     //var showImage by remember {mutableStateOf(false)}
-    val showImage by viewModel.showImage.collectAsState()
+
 
     Box(modifier = Modifier.fillMaxSize().background(color = babyBlue)){
         //when making a custom color, instead of doing color = Color.ColorName, do color = CustomColor
 
-        if(showImage) {
+        if(uiState.showPokeball) {
             Image(
                 painter = painterResource(id = R.drawable.andstudiopoke),
                 contentDescription = "Image of android studio logo combined with the pokemon symbol",
@@ -41,12 +50,12 @@ fun PokeScreenContent(viewModel: PokeViewModel){
         }
 
         FilledTonalButton(
-            onClick = { viewModel.setShowImage(true) },
+            onClick = {onShowPokeballClicked.invoke()},
             modifier = Modifier.align(Alignment.BottomCenter).padding(30.dp)
         ) { Text("Click to show image!") }
 
         FilledTonalButton(
-            onClick = { viewModel.setShowImage(false) },
+            onClick = { onHidePokeballClicked.invoke() },
             modifier = Modifier.align(Alignment.TopCenter).padding(30.dp)
         ) { Text("Click to remove image!") }
 
@@ -57,5 +66,7 @@ fun PokeScreenContent(viewModel: PokeViewModel){
 
 @Composable
 fun PokeScreenContentPreview(){
-    PokeScreenContent(viewModel = viewModel())
+    PokeScreenContent(uiState = PokeScreenUIState(),
+        onShowPokeballClicked = {},
+        onHidePokeballClicked = {})
 }
