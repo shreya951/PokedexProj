@@ -13,20 +13,25 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
-private const val BASE_URL = "https://pokeapi.co"
+private const val BASE_URL = "https://pokeapi.co/api/v2/"
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
+        return OkHttpClient
+            .Builder()
+            .build()
     }
 
     @Provides
     @Singleton
     fun provideMoshi(): Moshi {
-        return Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return Moshi
+            .Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
     }
 
     @Provides
@@ -34,8 +39,13 @@ object AppModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient, moshi: Moshi
     ): Retrofit {
-        return Retrofit.Builder().baseUrl(BASE_URL).client(okHttpClient)
-    .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
+        return Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory
+            .create(moshi))
+            .build()
     }
 
     @Provides
@@ -43,5 +53,12 @@ object AppModule {
     fun providePokeApiService(retrofit: Retrofit): PokeAPIService {
         return retrofit.create(PokeAPIService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun providePokeRepository(api: PokeAPIService): PokeRepository {
+        return PokeRepository(api)
+    }
+
 
 }

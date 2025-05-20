@@ -70,3 +70,5 @@ fun PokeScreenContentPreview(){
         onShowPokeballClicked = {},
         onHidePokeballClicked = {})
 }
+
+
