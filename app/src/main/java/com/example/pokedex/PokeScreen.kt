@@ -19,56 +19,84 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun PokeScreen(viewModel: PokeViewModel){
+fun PokeScreen(viewModel: PokeViewModel = hiltViewModel()) {
+
+    //using by means you dont need to do .value
     val uiState by viewModel.showImage.collectAsStateWithLifecycle()
+    val pokemonList by viewModel.pokemonList.collectAsStateWithLifecycle()
+
     PokeScreenContent(
+        //essentially passing what we already have
         uiState = uiState,
-        onShowPokeballClicked = {viewModel.setShowImage(true)},
-        onHidePokeballClicked = {viewModel.setShowImage(false)}
+        pokemonList = pokemonList,
+        onShowPokeballClicked = {
+            viewModel.setShowImage(true)
+            viewModel.pickAnotherRandomPokemon()
+        },
+        onHidePokeballClicked = {
+            viewModel.setShowImage(false)
+        }
     )
 }
+
 
 @Composable
 fun PokeScreenContent(
     uiState: PokeScreenUIState,
+    pokemonList: List<PokemonResult>,
+    //() means it takes no arguments, and Unit means it returns a void value
     onShowPokeballClicked: () -> Unit,
     onHidePokeballClicked: () -> Unit
-){
+) {
     val babyBlue = Color(0XFFB9DFF7)
-    //var showImage by remember {mutableStateOf(false)}
 
-
-    Box(modifier = Modifier.fillMaxSize().background(color = babyBlue)){
-        //when making a custom color, instead of doing color = Color.ColorName, do color = CustomColor
-
-        if(uiState.showPokeball) {
-            Image(
-                painter = painterResource(id = R.drawable.andstudiopoke),
-                contentDescription = "Image of android studio logo combined with the pokemon symbol",
-                modifier = Modifier.fillMaxWidth().align(Alignment.Center)
+    //when making a custom color, instead of doing color = Color.ColorName, do color = CustomColor
+    Box(modifier = Modifier.fillMaxSize().background(color = babyBlue)) {
+        if (uiState.showPokeball) {
+            val i = uiState.randomIndex
+            val pokemon = pokemonList[i]
+            Text(
+                //call attributes of pokemon bc we are getting a single pokemon from the list
+                text = "Name: ${pokemon.name}\nURL: ${pokemon.url}",
+                //modifier is essentially for spacing
+                modifier = Modifier.align(Alignment.Center).padding(16.dp)
             )
         }
 
         FilledTonalButton(
-            onClick = {onShowPokeballClicked.invoke()},
-            modifier = Modifier.align(Alignment.BottomCenter).padding(30.dp)
-        ) { Text("Click to show image!") }
+            onClick = onShowPokeballClicked,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(30.dp)
+        ) {
+            Text("Show a Pokemon!")
+        }
 
         FilledTonalButton(
-            onClick = { onHidePokeballClicked.invoke() },
-            modifier = Modifier.align(Alignment.TopCenter).padding(30.dp)
-        ) { Text("Click to remove image!") }
-
+            onClick = onHidePokeballClicked,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(30.dp)
+        ) {
+            Text("Hide Pokemon")
+        }
     }
-
 }
+
 
 
 @Composable
-fun PokeScreenContentPreview(){
-    PokeScreenContent(uiState = PokeScreenUIState(),
+fun PokeScreenContentPreview() {
+    val samplePokemonList = listOf(
+        PokemonResult(name = "bulbasaur", url = "https://pokeapi.co/api/v2/pokemon/1/"),
+        PokemonResult(name = "charmander", url = "https://pokeapi.co/api/v2/pokemon/4/"),
+        PokemonResult(name = "squirtle", url = "https://pokeapi.co/api/v2/pokemon/7/")
+    )
+
+    PokeScreenContent(
+        uiState = PokeScreenUIState(showPokeball = true, randomIndex = 0),
+        pokemonList = samplePokemonList,
         onShowPokeballClicked = {},
-        onHidePokeballClicked = {})
+        onHidePokeballClicked = {}
+    )
 }
-
-

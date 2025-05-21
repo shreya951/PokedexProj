@@ -22,7 +22,5 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         viewModel.fetchPokemon()
 
-
-
     }
 }

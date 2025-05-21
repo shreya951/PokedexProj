@@ -29,60 +29,42 @@ class PokeViewModel @Inject constructor(
     private val _pokemonList = MutableStateFlow<List<PokemonResult>>(emptyList())
     val pokemonList: StateFlow<List<PokemonResult>> = _pokemonList
 
-    //private val _uiState = MutableStateFlow(PokeScreenUIState())
-    //val showImage: StateFlow<PokeScreenUIState> = _uiState.asStateFlow()
-
-
     fun fetchPokemon() {
         viewModelScope.launch {
-
-            try {
-
-                val result = pokeRepository.getPokemonList()
-                _pokemonList.value = result  // Populate the Pokemon list
-                Log.d("ASDF", "Fetched Pokémon: $result[0].name")
-            } catch (e: Exception) {
-                Log.d("ASDF", "Failed to fetch Pokémon: $e")
+            kotlin.runCatching {
+                pokeRepository.getPokemonList()
+            }.onSuccess { result ->
+                _pokemonList.value = result
+                pickAnotherRandomPokemon() // set an initial random pokemon
+                Log.d("ASDF", "Received pokemon: $pokemonList")
+            }.onFailure { error ->
+                Log.d("ASDF", "Failed: $error")
             }
-
-            Log.d("ASDF", "Hello World")
         }
+
+        Log.d("ASDF", "Checking fetchPokemon function")
     }
 
 
+    //used to update ui state with one changed variable
     fun setShowImage(value: Boolean) {
         _showImage.update { pokeState ->
             pokeState.copy(showPokeball = value)
         }
     }
+
+
+    fun pickAnotherRandomPokemon() {
+        val list = _pokemonList.value
+        if (list.isNotEmpty()) {
+            val num = (0 until list.size - 1).random()
+            //making a copy of the current state of showImage
+            val currentState = _showImage.value
+            //then change the randomIndex to a new number
+            val newState = currentState.copy(randomIndex = num)
+            //update showImage
+            _showImage.value = newState
+        }
+    }
 }
 
-
-
-
-    /*
- fun fetchPokemon(){
-     viewModelScope.launch{
-         Log.d("ASDF", "fetchPokemon() called")
-         kotlin.runCatching {
-             // repository.getPokemonList()
-         }.onSuccess { pokemonList ->
-             Log.d("ASDF", "$pokemonList")
-         }.onFailure { error ->
-             Log.d("ASDF", "failed $error")
-         }
-         //val result = repository.getPokemonList()
-         // _pokemonList.value = result
-     }
- }
-
-
-
- fun setShowImage(value:Boolean){
-     _showImage.update { pokeState ->
-         pokeState.copy(showPokeball = value)
-     }
- }
-}
-
-*/
